@@ -19,6 +19,7 @@ public class User {
     private Long id;
     private String username;
     private String password;
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private boolean enabled;
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<Role> roles = new LinkedHashSet<>();
 }

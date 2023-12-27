@@ -24,7 +24,6 @@ public interface UserPrototype {
     void delete(Long id) throws UserNotFoundException;
 
     static UserDTO toDTO(User user) {
-        System.out.println(user);
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user,userDTO);
         // Converting
@@ -40,7 +39,6 @@ public interface UserPrototype {
             return roleDTO;
         }).collect(Collectors.toCollection(LinkedHashSet::new));
         userDTO.setRoles(roles);
-        System.out.println(userDTO);
         return userDTO;
     }
 

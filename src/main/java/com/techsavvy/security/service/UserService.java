@@ -1,11 +1,13 @@
 package com.techsavvy.security.service;
 
 import com.techsavvy.security.data.UserDTO;
+import com.techsavvy.security.domain.User;
 import com.techsavvy.security.exception.UserNotFoundException;
 import com.techsavvy.security.prototype.UserPrototype;
 import com.techsavvy.security.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 public class UserService implements UserPrototype {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public UserDTO getUserById(Long id) throws UserNotFoundException {
         com.techsavvy.security.domain.User user = userRepository.findById(id)
@@ -40,18 +43,19 @@ public class UserService implements UserPrototype {
 
     @Override
     public UserDTO create(UserDTO userDTO) {
-        log.info(" User Request - {}", userDTO);
-        com.techsavvy.security.domain.User userEntity = userRepository.save(UserPrototype.toEntity(userDTO));
-        log.info(" User Entity - {}", userEntity);
-        return UserPrototype.toDTO(userEntity);
+        User user = UserPrototype.toEntity(userDTO);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user = userRepository.save(user);
+        return UserPrototype.toDTO(user);
     }
 
     @Override
     public UserDTO update(Long id, UserDTO userDTO) throws UserNotFoundException {
-        com.techsavvy.security.domain.User userEntity = userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(""));
-        UserPrototype.copy(userDTO,userEntity);
-        return UserPrototype.toDTO(userRepository.save(userEntity));
+        UserPrototype.copy(userDTO,user);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        return UserPrototype.toDTO(userRepository.save(user));
     }
 
     @Override

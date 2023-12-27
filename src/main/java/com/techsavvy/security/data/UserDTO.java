@@ -1,5 +1,6 @@
 package com.techsavvy.security.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,8 @@ import java.util.Set;
 public class UserDTO {
     private Integer id;
     private String username;
+    @JsonIgnore
     private String password;
+    private boolean enabled;
     private Set<RoleDTO> roles = new LinkedHashSet<>();
 }

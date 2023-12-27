@@ -8,8 +8,4 @@ import java.util.List;
 @Configuration
 public class PermissionConfig {
 
-    @Bean
-    List<String> permissions() {
-        return List.of("CREATE_USER","UPDATE_USER","DELETE_USER");
-    }
 }

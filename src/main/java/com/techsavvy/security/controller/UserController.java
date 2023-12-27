@@ -1,5 +1,6 @@
 package com.techsavvy.security.controller;
 
+import com.techsavvy.security.annotations.ApiPermission;
 import com.techsavvy.security.data.UserDTO;
 import com.techsavvy.security.exception.UserNotFoundException;
 import com.techsavvy.security.service.UserService;
@@ -19,7 +20,8 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("{id}/id")
+    @GetMapping("id/{id}")
+    @ApiPermission("READ_USER")
     public UserDTO getById(@PathVariable Long id) throws UserNotFoundException {
         return userService.getUserById(id);
     }

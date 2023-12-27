@@ -8,6 +8,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -23,12 +26,13 @@ import java.util.stream.Collectors;
 @Component
 public class PermissionAspect {
 
-    @Autowired
-    private List<String> permissions;
-
     @Before("@annotation(apiPermission)")
     private void hasPermission(JoinPoint joinPoint, ApiPermission apiPermission) throws ApiAccessDeniedException {
-        log.info(String.join(" ,", permissions));
+        Set<String> permissions = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
         /*
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Annotation apiAnnotation = Arrays.stream(methodSignature.getMethod()
@@ -40,7 +44,7 @@ public class PermissionAspect {
                 }).findAny().orElseThrow();
         */
         Arrays.stream(apiPermission.value())
-                .filter(requiredPermission -> permissions.contains(requiredPermission))
+                .filter(permissions::contains)
                 .findAny().orElseThrow(() -> new ApiAccessDeniedException("Access Denied"));
 
     }
